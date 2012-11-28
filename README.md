@@ -5,6 +5,8 @@ Dm9Records - k2b2/k4b4 controller
 k2b2/k4b4 controller is a DIY USB-MIDI controller based PIC18F14K50.  
 This project is OpenSoruceHardWare.
 
+http://dm9records.com <http://dm9records.com>
+
 ## Licenses
 - Hardware ----- CreativeCommons 3.0 BY-SA <http://creativecommons.org/licenses/by-sa/3.0/>
 - Firmware ----- MIT license <http://opensource.org/licenses/MIT>
