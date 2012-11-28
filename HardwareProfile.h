@@ -77,6 +77,7 @@
 #define PROGRAMMABLE_WITH_USB_HID_BOOTLOADER
 
 #define CLOCK_FREQ 48000000
+
 /** Switches **************************************************
  SW1 - RC3
  SW2 - RC6

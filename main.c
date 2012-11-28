@@ -79,24 +79,16 @@ void Low_ISR(void) {
 #pragma interrupt YourHighPriorityISRCode
 
 void YourHighPriorityISRCode() {
-    //Check which interrupt flag caused the interrupt.
-    //Service the interrupt
-    //Clear the interrupt flag
-    //Etc.
 #if defined(USB_INTERRUPT)
     USBDeviceTasks();
 #endif
 
-} //This return will be a "retfie fast", since this is in a #pragma interrupt section
+}
 #pragma interruptlow YourLowPriorityISRCode
 
 void YourLowPriorityISRCode() {
-    //Check which interrupt flag caused the interrupt.
-    //Service the interrupt
-    //Clear the interrupt flag
-    //Etc.
 
-} //This return will be a "retfie", since this is in a #pragma interruptlow section
+}
     
 /** DECLARATIONS ***************************************************/
 #pragma code
@@ -168,7 +160,7 @@ void init(void) {
   *
  ********************************************************************/
 
-void updateSw(){
+void updateSw(void){
     unsigned char i;
     unsigned char currentSwState[4];
 
@@ -192,8 +184,44 @@ void updateSw(){
     }
 }
 
+// LED function
+void led(unsigned char num, unsigned char state){
+
+#ifdef k4b4
+    switch(num){
+        case 0:
+            PIN_LED1 = state;
+            break;
+        case 1:
+            PIN_LED2 = state;
+            break;
+        case 2:
+            PIN_LED3 = state;
+            break;
+        case 3:
+            PIN_LED4 = state;
+            break;
+        default:
+            break;
+    }
+#else
+    switch(num){
+        case 0:
+            PIN_LED1 = state;
+            PIN_LED3 = state;
+            break;
+        case 1:
+            PIN_LED2 = state;
+            PIN_LED4 = state;
+            break;
+        default:
+            break;
+    }
+#endif
+}
+
 // sendMidiNote ***********************************************************
-void sendMidiNote(){
+void sendMidiNote(void){
     unsigned char i;
     for(i=0;i<SW_NUM;i++){
         if(swChanged[i]==1){
@@ -205,11 +233,13 @@ void sendMidiNote(){
                 if(swState[i]==0){
                     midiData.CodeIndexNumber = MIDI_CIN_NOTE_ON;
                     midiData.DATA_0 = 0x90; //Note on
+                    led(i,1);
                 }else{
                     midiData.CodeIndexNumber = MIDI_CIN_NOTE_OFF;
                     midiData.DATA_0 = 0x80; //Note off
+                    led(i,0);
                 }
-                midiData.DATA_1 = 60+i; //pitch
+                midiData.DATA_1 = noteNo[i]; //pitch
                 midiData.DATA_2 = 0x7F; //velocity
 
                 USBTxHandle = USBTxOnePacket(MIDI_EP, (BYTE*) & midiData, 4);
@@ -241,29 +271,34 @@ void updatePot(){
     for(i=0;i<32;i++){
         tempValue += (int)readAdc(NO_POT1);
     }
-    potValue[0] = tempValue >> 5;
+    //tempValue = tempValue >> 6;
+    tempValue = tempValue >> 6;
+    potValue[0] = (tempValue  + potValue[0]) >> 1;
 
     tempValue = 0;
     for(i=0;i<32;i++){
         tempValue += (int)readAdc(NO_POT2);
     }
-    potValue[1] = tempValue >> 5;
-/*
+    tempValue = tempValue >> 6;
+    //potValue[1] = (lastPotValue[1] + tempValue) >> 1;
+    potValue[1] = (tempValue  + potValue[1]) >> 1;
+
+#ifdef k4b4
     tempValue = 0;
     for(i=0;i<32;i++){
         tempValue += (int)readAdc(NO_POT3);
     }
-    potValue[2] = tempValue >> 5;
+    potValue[2] = tempValue >> 6;
 
     tempValue = 0;
     for(i=0;i<32;i++){
         tempValue += (int)readAdc(NO_POT4);
     }
-    potValue[3] = tempValue >> 5;
- * */
+    potValue[3] = tempValue >> 6;
+#endif
 }
 
-void sendMidiCC(){
+void sendMidiCC(void){
     char i;
     for(i=0;i<POT_NUM;i++){
         if(potValue[i]!=lastPotValue[i]){
@@ -272,7 +307,7 @@ void sendMidiCC(){
                 midiData.CableNumber = 0;
                 midiData.CodeIndexNumber = MIDI_CIN_CONTROL_CHANGE;
                 midiData.DATA_0 = 0xB0; //CC
-                midiData.DATA_1 = 10+i; //CC No
+                midiData.DATA_1 = ccNo[i]; //CC No
                 midiData.DATA_2 = potValue[i]; //velocity
 
                 USBTxHandle = USBTxOnePacket(MIDI_EP, (BYTE*) & midiData, 4);
@@ -291,6 +326,8 @@ void sendMidiCC(){
 void delayUs(long us){
     while(us>0){
         _asm
+            nop
+            nop
             nop
             nop
             nop

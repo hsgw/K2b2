@@ -10,10 +10,18 @@
 #define	MAIN_H
 
 /** DEFINES ********************************************************/
-#define SW_NUM 2
-#define SW_DEBOUNCE 5
+//if use k4b4 uncomment following line
+#define k4b4
 
+#define SW_DEBOUNCE 1
+
+#ifdef k4b4
+#define POT_NUM 4
+#define SW_NUM 4
+#else
 #define POT_NUM 2
+#define SW_NUM 2
+#endif
 
 /** INCLUDES *******************************************************/
 #include "USB/usb.h"
@@ -74,17 +82,23 @@ unsigned char swChanged[4];
 unsigned char potValue[4];
 unsigned char lastPotValue[4];
 
+const unsigned char ccNo[4] = {10,11,12,13};
+const unsigned char noteNo[4] = {10,11,12,13};
+
 /** PRIVATE PROTOTYPES *********************************************/
 void init(void);
 
 //switch function
-void updateSw();
-void sendMidiNote();
+void updateSw(void);
+void sendMidiNote(void);
+
+//LED function
+void led(unsigned char num, unsigned char state);
 
 //adc function
 unsigned char readAdc(unsigned char num);
-void updatePot();
-void sendMidiCC();
+void updatePot(void);
+void sendMidiCC(void);
 
 void delayUs(long us);
 
