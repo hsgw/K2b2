@@ -266,36 +266,22 @@ unsigned char readAdc(unsigned char num){
 }
 
 void updatePot(){
-    char i;
-    int tempValue = 0;
-    for(i=0;i<32;i++){
-        tempValue += (int)readAdc(NO_POT1);
-    }
-    //tempValue = tempValue >> 6;
-    tempValue = tempValue >> 6;
-    potValue[0] = (tempValue  + potValue[0]) >> 1;
+    char i,pot;
+    int tempValue;
 
-    tempValue = 0;
-    for(i=0;i<32;i++){
-        tempValue += (int)readAdc(NO_POT2);
+    for(pot=0;pot<POT_NUM;pot++){
+        tempValue = (int)readAdc(no_pot[pot]);
+        tempValue = 0;
+        for(i=0;i<4;i++){
+            tempValue += (int)readAdc(no_pot[pot]) >> 1;
+        }
+        tempValue = tempValue >> 2;
+        if(tempValue >= 127){
+            potValue[pot] = 127;
+        }else{
+            potValue[pot] = (tempValue + potValue[pot]) >> 1;
+        }
     }
-    tempValue = tempValue >> 6;
-    //potValue[1] = (lastPotValue[1] + tempValue) >> 1;
-    potValue[1] = (tempValue  + potValue[1]) >> 1;
-
-#ifdef k4b4
-    tempValue = 0;
-    for(i=0;i<32;i++){
-        tempValue += (int)readAdc(NO_POT3);
-    }
-    potValue[2] = tempValue >> 6;
-
-    tempValue = 0;
-    for(i=0;i<32;i++){
-        tempValue += (int)readAdc(NO_POT4);
-    }
-    potValue[3] = tempValue >> 6;
-#endif
 }
 
 void sendMidiCC(void){

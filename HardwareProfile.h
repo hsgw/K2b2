@@ -116,6 +116,7 @@
 #define TRISB_POT 0B00010000
 #define TRISC_POT 0B00000111
 
+//see main.h no_pot[]
 #define NO_POT1 5
 #define NO_POT2 4
 #define NO_POT3 6

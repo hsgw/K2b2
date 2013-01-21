@@ -11,7 +11,7 @@
 
 /** DEFINES ********************************************************/
 //if use k4b4 uncomment following line
-#define k4b4
+//#define k4b4
 
 #define SW_DEBOUNCE 1
 
@@ -67,6 +67,12 @@
 #define TX_BUFFER_ADDRESS_TAG
 #define MIDI_EVENT_ADDRESS_TAG
 
+#ifdef k4b4
+#define POT_NUM 4
+#else
+#define POT_NUM 2
+#endif
+
 unsigned char ReceivedDataBuffer[64] RX_BUFFER_ADDRESS_TAG;
 unsigned char ToSendDataBuffer[64] TX_BUFFER_ADDRESS_TAG;
 USB_AUDIO_MIDI_EVENT_PACKET midiData MIDI_EVENT_ADDRESS_TAG;
@@ -81,6 +87,8 @@ unsigned char swChanged[4];
 
 unsigned char potValue[4];
 unsigned char lastPotValue[4];
+
+const char no_pot[4] = {NO_POT1, NO_POT2, NO_POT3, NO_POT4};
 
 const unsigned char ccNo[4] = {10,11,12,13};
 const unsigned char noteNo[4] = {10,11,12,13};
